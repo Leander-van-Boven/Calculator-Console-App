@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 //
-// Recursive defined interface, program will jump from the parser to the interface and back through the progress of solving the sum
+// // Recursive defined interface, the program will jump from the parser 'Make' section to the interface and back through the progress of solving the sum.
+// // Operators are processed, and ISum's get values, here.
 //
+
 namespace Calculator
 {
     public interface ISum
@@ -25,7 +28,7 @@ namespace Calculator
         }
         public double Value()
         {
-            return double.Parse(digit);
+            return double.Parse(digit);                 // Only place in the whole program where the actual number is parsed to a double
         }
         public override string ToString()
         {

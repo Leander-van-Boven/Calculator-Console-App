@@ -118,11 +118,11 @@ namespace Calculator
             if (cursor < length && contents[cursor] == '(')
             {
                 cursor++;
-                ISum resultaat = ParseSubtraction();
+                ISum result = ParseSubtraction();
                 SkipSpaces();
-                if (contents[cursor] != ')') throw new Exception("Sluithaakje ontbreekt op positie " + cursor);
+                if (contents[cursor] != ')') throw new Exception("Closing parenthesis is missing on position:  " + cursor);
                 cursor++;
-                return resultaat;
+                return result;
             }
             else
             {
@@ -142,26 +142,26 @@ namespace Calculator
                         cursor++;
                     }
                 }
-                ISum resultaat = MaakGetal(number);
-                return resultaat;
+                ISum result = MakeDigit(number);
+                return result;
             }
         }
         //
         // // 
         //
-        private ISum MaakGetal(string number)
+        private ISum MakeDigit(string number)
         {
             Number digit = new Number(number);
             return digit;
         }
-        private ISum MakeSubtraction(ISum links, ISum rechts)
+        private ISum MakeSubtraction(ISum left, ISum right)
         {
-            Subtraction difference = new Subtraction(links, rechts);
+            Subtraction difference = new Subtraction(left, right);
             return difference;
         }
-        private ISum MakeAddition(ISum links, ISum rechts)
+        private ISum MakeAddition(ISum left, ISum right)
         {
-            Addition addition = new Addition(links, rechts);
+            Addition addition = new Addition(left, right);
             return addition;
         }
         private ISum MakeDivision(ISum left, ISum right)
@@ -169,20 +169,20 @@ namespace Calculator
             Division division = new Division(left, right);
             return division;
         }
-        private ISum MakeMultiplication(ISum links, ISum rechts)
+        private ISum MakeMultiplication(ISum left, ISum right)
         {
-            Product product = new Product(links, rechts);
+            Product product = new Product(left, right);
             return product;
         }
-        private ISum MakeRoot(ISum grond, ISum expo)
+        private ISum MakeRoot(ISum ground, ISum expo)
         {
-            Root wortel = new Root(grond, expo);
-            return wortel;
+            Root root = new Root(ground, expo);
+            return root;
         }
         private ISum MakePower(ISum grond, ISum expo)
         {
-            Power macht = new Power(grond, expo);
-            return macht;
+            Power power = new Power(grond, expo);
+            return power;
         }
     }
 }
