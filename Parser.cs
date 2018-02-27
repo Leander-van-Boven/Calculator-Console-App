@@ -33,6 +33,7 @@ namespace Calculator
         }
         //
         // // Recognition of different kind of operators, set up so that priority is taken into account, recursively defined
+        // // When an operator is recognized the ISum is passed through to the 'Make' section
         //
         private ISum ParseSum()
         {
@@ -147,7 +148,8 @@ namespace Calculator
             }
         }
         //
-        // // 
+        // // 'Make' section, ISum's are here split into two parts, 
+        // // send to the interface, put together, and send back to 'Recognition' section
         //
         private ISum MakeDigit(string number)
         {
