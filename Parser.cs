@@ -4,173 +4,184 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace Rekenmachine
+namespace Calculator
 {
     class Parser
     {
-        private string inhoud;
+        private string contents;
         private int cursor;
-        private int lengte;
+        private int length;
         private char d = Convert.ToChar(Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator);
 
-        public static ISom ParseSom(string s)
+        public static ISum ParseSom(string s)
         {
             Parser parser = new Parser(s);
-            return parser.ParseSom();
+            return parser.ParseSum();
         }
 
-        private Parser(string s)
+        private Parser(string s)            
         {
-            inhoud = s;
-            cursor = 0;
-            lengte = s.Length;
+            contents = s;
+            cursor = 0;                 // Parser setup, cursor starts at the first character
+            length = s.Length;
         }
 
         private void SkipSpaces()
         {
-            while (cursor < lengte && char.IsWhiteSpace(inhoud[cursor]))
+            while (cursor < length && char.IsWhiteSpace(contents[cursor]))      // Deals with extra whitespaces in between parts of the sum
                 cursor++;
         }
-
-        private ISom ParseSom()
+        //
+        // // Recognition of different kind of operators, set up so that priority is taken into account, recursively defined
+        //
+        private ISum ParseSum()
         {
-            ISom g = ParseVerschil();
+            ISum g = ParseSubtraction();
             SkipSpaces();
-            //if (cursor < lengte)
-            //    throw new Exception($"Extra input op positie {cursor} {inhoud[cursor]}");
             return g;
         }
-
-        private ISom ParseGetal()
+        private ISum ParseSubtraction()
         {
+            ISum o = ParseAddition();
             SkipSpaces();
-            if (cursor<lengte && inhoud[cursor] == '(')
+            if (cursor < length - 1 && contents[cursor] == '-')
             {
                 cursor++;
-                ISom resultaat = ParseVerschil();
+                ISum a = ParseSubtraction();
+                return MakeSubtraction(o, a);
+            }
+            return o;
+        }
+        private ISum ParseAddition()
+        {
+            ISum d = ParseDivision();
+            SkipSpaces();
+            if (cursor < length - 1 && contents[cursor] == '+')
+            {
+                cursor++;
+                ISum o = ParseAddition();
+                return MakeAddition(d, o);
+            }
+            return d;
+        }
+        private ISum ParseDivision()
+        {
+            ISum v = ParseMultiplication();
+            SkipSpaces();
+            if (cursor < length -1 && contents[cursor] == '/')
+            {
+                cursor++;
+                ISum d = ParseDivision();
+                return MakeDivision(v, d);
+            }
+            return v;
+        }
+        private ISum ParseMultiplication()
+        {
+            ISum w = ParseRoot();
+            SkipSpaces();
+            if (cursor < length - 1 && contents[cursor] == '*')
+            {
+                cursor++;
+                ISum v = ParseMultiplication();
+                return MakeMultiplication(w, v);
+            }
+            return w;
+        }
+        private ISum ParseRoot()
+        {
+            ISum m = ParsePower();
+            SkipSpaces();
+            if (cursor < length - 1 && contents[cursor] == 'V')
+            {
+                cursor++;
+                ISum w = ParseRoot();
+                return MakeRoot(m, w);
+            }
+            return m;
+        }
+        private ISum ParsePower()
+        {
+            ISum g = ParseNumber();
+            SkipSpaces();
+            if (cursor < length - 1 && contents[cursor] == '^')
+            {
+                cursor++;
+                ISum m = ParsePower();
+                return MakePower(g, m);
+            }
+            return g;
+        }
+        private ISum ParseNumber()
+        {
+            SkipSpaces();
+            if (cursor < length && contents[cursor] == '(')
+            {
+                cursor++;
+                ISum resultaat = ParseSubtraction();
                 SkipSpaces();
-                if (inhoud[cursor] != ')') throw new Exception("Sluithaakje ontbreekt op positie " + cursor);
+                if (contents[cursor] != ')') throw new Exception("Sluithaakje ontbreekt op positie " + cursor);
                 cursor++;
                 return resultaat;
             }
             else
             {
-                string getal = "";
-                while (cursor < lengte && char.IsDigit(inhoud[cursor]) == true)
+                string number = "";
+                while (cursor < length && char.IsDigit(contents[cursor]) == true)
                 {
-                    getal = getal + char.ToString(inhoud[cursor]);
+                    number = number + char.ToString(contents[cursor]);
                     cursor++;
                 }
-                if (cursor < lengte && (inhoud[cursor].Equals(',') || inhoud[cursor].Equals('.') || inhoud[cursor].Equals(d)))
+                if (cursor < length && (contents[cursor].Equals(',') || contents[cursor].Equals('.') || contents[cursor].Equals(d)))
                 {
-                    getal = getal + d;
+                    number = number + d;
                     cursor++;
-                    while (cursor < lengte && char.IsDigit(inhoud[cursor]) == true)
+                    while (cursor < length && char.IsDigit(contents[cursor]) == true)
                     {
-                        getal = getal + char.ToString(inhoud[cursor]);
+                        number = number + char.ToString(contents[cursor]);
                         cursor++;
                     }
                 }
-                ISom resultaat = MaakGetal(getal);
+                ISum resultaat = MaakGetal(number);
                 return resultaat;
             }
         }
-
-        private ISom ParseVerschil()
-        {
-            ISom o = ParseOptelling();
-            SkipSpaces();
-            if (cursor < lengte - 1 && inhoud[cursor] == '-')
-            {
-                cursor++;
-                ISom a = ParseVerschil();
-                return MaakVerschil(o, a);
-            }
-            return o;
-        }
-
-        private ISom ParseOptelling()
-        {
-            ISom d = ParseDeling();
-            SkipSpaces();
-            if (cursor < lengte - 1 && inhoud[cursor] == '+')
-            {
-                cursor++;
-                ISom o = ParseOptelling();
-                return MaakOptelling(d, o);
-            }
-            return d;
-        }
-
-        private ISom ParseDeling()
-        {
-            ISom v = ParseVermenigvuldiging();
-            SkipSpaces();
-            if (cursor < lengte -1 && inhoud[cursor] == '/')
-            {
-                cursor++;
-                ISom d = ParseDeling();
-                return MaakDeling(v, d);
-            }
-            return v;
-        }
-
-        private ISom ParseVermenigvuldiging()
-        {
-            ISom m = ParseMacht();
-            SkipSpaces();
-            if (cursor < lengte - 1 && inhoud[cursor] == '*')
-            {
-                cursor++;
-                ISom v = ParseVermenigvuldiging();
-                return MaakVermenigvuldiging(m, v);
-            }
-            return m;
-        }
-
-        private ISom ParseMacht()
-        {
-            ISom g = ParseGetal();
-            SkipSpaces();
-            if (cursor < lengte - 1 && inhoud[cursor] == '^')
-            {
-                cursor++;
-                ISom m = ParseMacht();
-                return MaakMacht(g, m);
-            }
-            return g;
-        }
         //
-        // //
+        // // 
         //
-        private ISom MaakGetal(string getal)
+        private ISum MaakGetal(string number)
         {
-            Getal cijfer = new Getal(getal);
-            return cijfer;
+            Number digit = new Number(number);
+            return digit;
         }
-        private ISom MaakVerschil(ISom links, ISom rechts)
+        private ISum MakeSubtraction(ISum links, ISum rechts)
         {
-            Verschil verschil = new Verschil(links, rechts);
-            return verschil;
+            Subtraction difference = new Subtraction(links, rechts);
+            return difference;
         }
-        private ISom MaakOptelling(ISom links, ISom rechts)
+        private ISum MakeAddition(ISum links, ISum rechts)
         {
-            Som optelling = new Som(links, rechts);
-            return optelling;
+            Addition addition = new Addition(links, rechts);
+            return addition;
         }
-        private ISom MaakDeling(ISom links, ISom rechts)
+        private ISum MakeDivision(ISum left, ISum right)
         {
-            Deling deling = new Deling(links, rechts);
-            return deling;
+            Division division = new Division(left, right);
+            return division;
         }
-        private ISom MaakVermenigvuldiging(ISom links, ISom rechts)
+        private ISum MakeMultiplication(ISum links, ISum rechts)
         {
             Product product = new Product(links, rechts);
             return product;
         }
-        private ISom MaakMacht(ISom grond, ISom expo)
+        private ISum MakeRoot(ISum grond, ISum expo)
         {
-            Macht macht = new Macht(grond, expo);
+            Root wortel = new Root(grond, expo);
+            return wortel;
+        }
+        private ISum MakePower(ISum grond, ISum expo)
+        {
+            Power macht = new Power(grond, expo);
             return macht;
         }
     }

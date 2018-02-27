@@ -1,0 +1,7 @@
+C:\Users\Leander\source\repos\Rekenmachine\Rekenmachine\bin\Debug\Rekenmachine.exe.config
+C:\Users\Leander\source\repos\Rekenmachine\Rekenmachine\bin\Debug\Rekenmachine.exe
+C:\Users\Leander\source\repos\Rekenmachine\Rekenmachine\bin\Debug\Rekenmachine.pdb
+C:\Users\Leander\source\repos\Rekenmachine\Rekenmachine\obj\Debug\Calculator.csprojResolveAssemblyReference.cache
+C:\Users\Leander\source\repos\Rekenmachine\Rekenmachine\obj\Debug\Calculator.csproj.CoreCompileInputs.cache
+C:\Users\Leander\source\repos\Rekenmachine\Rekenmachine\obj\Debug\Rekenmachine.exe
+C:\Users\Leander\source\repos\Rekenmachine\Rekenmachine\obj\Debug\Rekenmachine.pdb
