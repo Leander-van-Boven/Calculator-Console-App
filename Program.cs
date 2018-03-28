@@ -14,12 +14,13 @@ namespace Calculator
     {
         public static void Main()
         {
+         Console.WriteLine("Type in any calculation you want! \n-Use brackets for priority, * as multiplication symbol, " +                      //Welcome message
+         "\n-Use xVy for a \'factor y root out x\', and x^y for \'x to the power y\' \nTips and bugreports are appreciated! \n--- \n");  
             while (true)
             {
                 try
                 {
-                    Console.WriteLine("Type in any calculation you want! \n-Use brackets for priority, * as multiplication symbol, " +                      //Welcome message
-                        "\n-Use xVy for a \'factor y root out x\', and x^y for \'x to the power y\' \nTips and bugreports are appreciated! \n--- \n");
+
 
                     String input = Console.ReadLine();
                     ISum Sum = Parser.ParseSom(input);
